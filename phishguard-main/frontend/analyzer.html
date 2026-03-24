@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>PhishGuard AI Analyzer</title>
+
+<style>
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: radial-gradient(circle at top, #0f172a, #020617);
+  color: white;
+  text-align: center;
+  padding: 40px;
+}
+
+/* Glassmorphism Card */
+.container {
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(15px);
+  padding: 40px;
+  border-radius: 20px;
+  width: 650px;
+  margin: auto;
+  box-shadow: 0 0 40px rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: 0.3s;
+}
+
+.container:hover {
+  transform: translateY(-5px);
+}
+
+/* Title */
+h1 {
+  font-size: 32px;
+  letter-spacing: 1px;
+}
+
+.subtitle {
+  color: #94a3b8;
+  margin-bottom: 25px;
+}
+
+/* Input */
+input {
+  width: 85%;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  background: #0f172a;
+  color: white;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+}
+
+/* Buttons */
+button {
+  padding: 12px 25px;
+  margin: 12px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.scan-btn {
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  color: white;
+}
+
+.scan-btn:hover {
+  transform: scale(1.05);
+}
+
+.home-btn {
+  background: #1e293b;
+  color: #cbd5f5;
+}
+
+.home-btn:hover {
+  background: #334155;
+}
+
+/* Risk Bar */
+#riskBar {
+  height: 18px;
+  width: 0%;
+  border-radius: 10px;
+  margin: 20px auto;
+  transition: width 0.5s ease;
+}
+
+/* Result Cards */
+.safe, .warn, .danger {
+  padding: 25px;
+  border-radius: 15px;
+  margin-top: 20px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.safe { background: rgba(34,197,94,0.2); border:1px solid #22c55e; }
+.warn { background: rgba(245,158,11,0.2); border:1px solid #f59e0b; }
+.danger { background: rgba(239,68,68,0.2); border:1px solid #ef4444; }
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity:0; transform:translateY(10px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+/* Glow effect */
+.glow {
+  text-shadow: 0 0 10px rgba(59,130,246,0.8);
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<button class="home-btn" onclick="window.location.href='home.html'">⬅ Home</button>
+
+<h1 class="glow">🛡️ PhishGuard AI Analyzer</h1>
+<p class="subtitle">Advanced phishing detection • Real-world simulation</p>
+
+<input type="text" id="urlInput" placeholder="🔗 Paste suspicious URL here...">
+<br>
+
+<button class="scan-btn" onclick="analyze()">🚀 Scan Website</button>
+
+<div id="riskBar"></div>
+<div id="output"></div>
+
+</div>
+
+<script>
+
+function analyze(){
+  let raw = document.getElementById("urlInput").value.trim();
+
+  if(!raw){
+    alert("Enter URL");
+    return;
+  }
+
+  let url = raw.split("?")[0].toLowerCase();
+
+  let risk = 0;
+  let issues = [];
+  let confidence = 70;
+
+  const trusted = ["google.com","amazon.com","microsoft.com","apple.com","opera.com","youtube.com"];
+
+  if(trusted.some(d => url.includes(d))){
+    risk -= 30;
+    confidence += 10;
+  }
+
+  if(!url.startsWith("https://")){
+    risk += 25;
+    issues.push("❌ Not using HTTPS");
+  }
+
+  if(url.match(/https?:\/\/\d+\.\d+\.\d+\.\d+/)){
+    risk += 40;
+    issues.push("⚠ Uses IP address");
+    confidence += 10;
+  }
+
+  let dots = (url.match(/\./g)||[]).length;
+  if(dots > 3){
+    risk += 15;
+    issues.push("⚠ Too many subdomains");
+  }
+
+  if(url.match(/[lI1]/)){
+    risk += 10;
+    issues.push("⚠ Possible spoofed characters");
+  }
+
+  if(url.match(/login|verify|secure|account|bank|update/i)){
+    risk += 15;
+    issues.push("⚠ Sensitive keywords");
+  }
+
+  if(url.match(/bit\.ly|tinyurl|goo\.gl/)){
+    risk += 30;
+    issues.push("⚠ URL shortener used");
+    confidence += 10;
+  }
+
+  if(url.length > 80){
+    risk += 10;
+    issues.push("⚠ URL too long");
+  }
+
+  if(risk < 0) risk = 0;
+  if(risk > 100) risk = 100;
+
+  let bar = document.getElementById("riskBar");
+  bar.style.width = risk + "%";
+
+  let output = "";
+
+  if(risk >= 60){
+    bar.style.background="red";
+    output = `
+    <div class="danger">
+    <h2>🚨 Dangerous Website</h2>
+    <p>High phishing probability</p>
+    <p><b>Risk:</b> ${risk}%</p>
+    <p>${issues.join("<br>")}</p>
+    <p><b>Confidence:</b> ${confidence}%</p>
+    </div>`;
+  }
+  else if(risk >= 30){
+    bar.style.background="orange";
+    output = `
+    <div class="warn">
+    <h2>⚠ Suspicious Website</h2>
+    <p>Proceed carefully</p>
+    <p><b>Risk:</b> ${risk}%</p>
+    <p>${issues.join("<br>")}</p>
+    <p><b>Confidence:</b> ${confidence}%</p>
+    </div>`;
+  }
+  else{
+    bar.style.background="limegreen";
+    output = `
+    <div class="safe">
+    <h2>✅ Likely Safe</h2>
+    <p>No major threats detected</p>
+    <p><b>Risk:</b> ${risk}%</p>
+    <p><b>Confidence:</b> ${confidence}%</p>
+    </div>`;
+  }
+
+  document.getElementById("output").innerHTML = output;
+}
+
+</script>
+
+</body>
+</html>

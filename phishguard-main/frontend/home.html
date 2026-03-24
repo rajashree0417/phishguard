@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>PhishGuard</title>
+
+<style>
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: radial-gradient(circle at top, #0f172a, #020617);
+  color: white;
+  text-align: center;
+  padding: 50px;
+  overflow: hidden;
+}
+
+/* Animated glow background */
+body::before {
+  content: "";
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(59,130,246,0.2), transparent);
+  top: -100px;
+  left: -100px;
+  animation: moveGlow 8s infinite alternate;
+}
+
+@keyframes moveGlow {
+  from { transform: translate(0,0); }
+  to { transform: translate(200px,150px); }
+}
+
+/* Title */
+h1 {
+  font-size: 40px;
+  margin-bottom: 10px;
+  text-shadow: 0 0 15px rgba(59,130,246,0.8);
+}
+
+/* Subtitle */
+.subtitle {
+  color: #94a3b8;
+  margin-bottom: 50px;
+  font-size: 18px;
+}
+
+/* Cards container */
+.cards {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+}
+
+/* Glass cards */
+.card {
+  background: rgba(30,41,59,0.6);
+  backdrop-filter: blur(15px);
+  padding: 30px;
+  width: 300px;
+  border-radius: 20px;
+  transition: 0.3s;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 0 25px rgba(0,0,0,0.5);
+}
+
+.card:hover {
+  transform: translateY(-10px) scale(1.03);
+  box-shadow: 0 0 30px rgba(59,130,246,0.4);
+}
+
+/* Icons */
+.icon {
+  font-size: 40px;
+  margin-bottom: 15px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
+
+/* Titles */
+.card h2 {
+  margin-bottom: 10px;
+}
+
+/* Description */
+.card p {
+  color: #cbd5f5;
+  font-size: 14px;
+}
+
+/* Footer */
+.footer {
+  margin-top: 80px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* Glow text */
+.highlight {
+  color: #38bdf8;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>🛡️ PhishGuard</h1>
+<p class="subtitle">
+Learn • Detect • Protect — Stay ahead of <span class="highlight">cyber threats</span>
+</p>
+
+<div class="cards">
+
+  <div class="card" onclick="location.href='index.html'">
+    <div class="icon">🧠</div>
+    <h2>Phishing Simulator</h2>
+    <p>
+      Train your instincts with real-world phishing scenarios. 
+      Improve your ability to detect scams before it's too late.
+    </p>
+  </div>
+
+  <div class="card" onclick="location.href='analyzer.html'">
+    <div class="icon">🔍</div>
+    <h2>Link Analyzer</h2>
+    <p>
+      Scan suspicious URLs and detect phishing patterns using 
+      intelligent security analysis.
+    </p>
+  </div>
+
+</div>
+
+<div class="footer">
+Built for Cybersecurity Awareness 🚀
+</div>
+
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>PhishGuard Simulator</title>
+
+<style>
+body {
+  font-family: 'Segoe UI';
+  background: linear-gradient(135deg,#0f172a,#020617);
+  color: white;
+  text-align: center;
+  padding: 40px;
+}
+
+.card {
+  background: #1e293b;
+  padding: 30px;
+  border-radius: 15px;
+  width: 550px;
+  margin: auto;
+  box-shadow: 0 0 25px rgba(0,0,0,0.5);
+}
+
+.msg {
+  background: #334155;
+  padding: 15px;
+  border-radius: 10px;
+  margin: 20px 0;
+}
+
+.highlight {
+  color: #f87171;
+  font-weight: bold;
+}
+
+button {
+  padding: 10px 20px;
+  margin: 10px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.phish { background: #ef4444; color: white; }
+.safe { background: #22c55e; color: white; }
+.investigate { background: #3b82f6; color: white; }
+
+.progress-bar {
+  width: 100%;
+  height: 10px;
+  background: #334155;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress {
+  height: 10px;
+  background: #38bdf8;
+  width: 0%;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<!-- ✅ HOME BUTTON ADDED -->
+<button onclick="window.location.href='home.html'" style="
+  background:#1e293b;
+  color:#cbd5f5;
+  border:none;
+  padding:8px 16px;
+  border-radius:10px;
+  cursor:pointer;
+  margin-bottom:10px;
+">
+⬅ Home
+</button>
+
+<h1>🛡️ PhishGuard Simulator</h1>
+<p>Train like a cybersecurity analyst</p>
+
+<select id="difficulty">
+  <option value="easy">Easy</option>
+  <option value="medium">Medium</option>
+  <option value="hard">Hard</option>
+</select>
+
+<p id="timer">Time: 20</p>
+
+<div class="progress-bar">
+  <div class="progress" id="progress"></div>
+</div>
+
+<div class="msg" id="questionBox"></div>
+
+<button class="investigate" onclick="investigate()">🔍 Investigate</button>
+<br>
+
+<button class="phish" onclick="answer(true)">Phishing</button>
+<button class="safe" onclick="answer(false)">Safe</button>
+
+<p id="result"></p>
+<p id="explanation"></p>
+
+<h3 id="score">Score: 0</h3>
+
+</div>
+
+<script>
+
+let questions = [];
+let current = 0;
+let score = 0;
+let time = 20;
+let timer;
+
+// LOAD QUESTIONS
+async function loadQuestions() {
+  const res = await fetch("https://phishguard.onrender.com/questions");
+  let all = await res.json();
+
+  let level = document.getElementById("difficulty").value;
+
+  if(level === "easy"){
+    questions = all.slice(0,8);
+  } else if(level === "medium"){
+    questions = all.slice(8,16);
+  } else {
+    questions = all.slice(16,24);
+  }
+
+  current = 0;
+  score = 0;
+  showQuestion();
+}
+
+// SHOW QUESTION
+function showQuestion() {
+  clearInterval(timer);
+  time = 20;
+
+  document.getElementById("timer").innerText = "Time: " + time;
+
+  let q = questions[current];
+
+  document.getElementById("questionBox").innerHTML =
+    highlight(q.message);
+
+  updateProgress();
+
+  timer = setInterval(()=>{
+    time--;
+    document.getElementById("timer").innerText = "Time: " + time;
+
+    if(time === 0){
+      clearInterval(timer);
+      nextQuestion();
+    }
+  },1000);
+}
+
+// HIGHLIGHT
+function highlight(text){
+  return text
+  .replace(/http/g,'<span class="highlight">http</span>')
+  .replace(/urgent|win|click|verify|account/gi,'<span class="highlight">$&</span>');
+}
+
+// INVESTIGATION MODE
+function investigate(){
+  document.getElementById("explanation").innerText =
+  "🔍 Look for: suspicious links, urgency, unknown sender, spelling errors.";
+}
+
+// ANSWER
+function answer(user){
+  clearInterval(timer);
+
+  let q = questions[current];
+
+  if(user === q.isPhishing){
+    score++;
+    document.getElementById("result").innerText = "🔥 Correct!";
+  } else {
+    document.getElementById("result").innerText = "💀 Wrong!";
+  }
+
+  document.getElementById("score").innerText = "Score: " + score;
+
+  document.getElementById("explanation").innerText =
+    "💡 " + q.explanation;
+
+  setTimeout(nextQuestion,2000);
+}
+
+// NEXT
+function nextQuestion(){
+  current++;
+
+  if(current >= questions.length){
+    showFinal();
+    return;
+  }
+
+  showQuestion();
+}
+
+// PROGRESS BAR
+function updateProgress(){
+  let percent = (current / questions.length) * 100;
+  document.getElementById("progress").style.width = percent + "%";
+}
+
+// FINAL SCREEN
+function showFinal(){
+  let msg = "";
+
+  if(score === questions.length){
+    msg = "🧠 Cyber Expert!";
+  } else if(score > questions.length/2){
+    msg = "👍 Good Awareness!";
+  } else {
+    msg = "⚠️ Needs Improvement!";
+  }
+
+  document.querySelector(".card").innerHTML =
+  `<h1>🎉 Quiz Completed</h1>
+   <h2>${msg}</h2>
+   <h3>Score: ${score}/${questions.length}</h3>
+   <button onclick="location.reload()">Restart</button>`;
+}
+
+// LOAD FIRST
+loadQuestions();
+
+</script>
+
+</body>
+</html>
+<script src="script.js"></script>
